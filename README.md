@@ -6,10 +6,10 @@
 * POST /v1/domain 
 
 ### DomainList (도메인 리스트 조회. 사전 검색) </br>
-* GET /v1/domain?page=0&limit=15&search=time&lang=en
+* GET /v1/domain
 
 ### DomainTransaction (도메인 -> 코드 변환) </br>
-* GET /v1/domain/transactions?page=0&limit=10&search=일&lang=ko
+* GET /v1/domain/transactions
 
 
 ## [관리자용 API]
@@ -18,7 +18,7 @@
 * POST /v1/admin/domain
 
 ### DomainList (도메인 리스트 조회) </br>
-* GET /v1/admin/domain?page=0&limit=10&search=time&lang=en&project=proj
+* GET /v1/admin/domain
 
 ### Domain (도메인 상세 조회) </br>
 * GET /v1/admin/domain/{id}
@@ -36,7 +36,7 @@
 * POST /v1/admin/users
 
 ### UserList (유저 리스트 조회) </br>
-* GET /v1/admin/users?page =0&limit=10&name=name&email=email&security_key=skey&client_id=cid
+* GET /v1/admin/users
 
 ### User (유저 상세 조회) </br>
 * GET /v1/admin/users/{id}
