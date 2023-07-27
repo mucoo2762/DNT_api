@@ -1,0 +1,60 @@
+server:
+  servlet:
+    context-path: /
+  port: 8120
+
+spring:
+  datasource:
+    url: jdbc:mariadb://10.0.1.10:3306/dnt?allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: 10041004
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  zipkin:
+    base-url: ${SPRING_ZIPKIN_BASE_URL:http://10.0.1.60:9411/}
+  config:
+    import: ${SPRING_CONFIG_IMPORT:optional:configserver:http://localhost:9296}
+  application:
+    name: API-SERVICE
+  profiles:
+    active:
+      - dev
+#  jpa:
+#    properties:
+#      # rev_type (1:add(insert), 2:modify(update), 3:delete)
+#      org.hibernate.envers.revision_field_name: REV
+#      org.hibernate.envers.revision_type_field_name: REV_TYPE
+#      org.hibernate.envers.audit_table_prefix: LOG_
+#      org.hibernate.envers.audit_table_suffix:
+#      hibernate.integration.envers.enabled: true # envert 활성화
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        automatic-transition-from-open-to-half-open-enabled: true
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        wait-duration-in-open-state: 5s
+        sliding-window-type: COUNT_BASED
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+
+pagesearch:
+  page: 0
+  limit: 20
+
+# jwt secret key 설정
+jwt.secret: '8sknjlO3NPTBqo319DHLNqsQAfRJEdKsETOds'

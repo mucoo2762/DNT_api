@@ -1,0 +1,33 @@
+ifndef::snippet[]
+:snippet: ../../../build/generated-snippets
+endif::[]
+
+[[introduction]]
+== 소개
+- Get //v1/domain
+
+== 요청
+
+// === [Request Headers]
+// include::{snippet}/test-apiGetCodeList/request-headers.adoc[]
+
+=== [Request Parameters]
+include::{snippet}/test-apiGetCodeList/request-parameters.adoc[]
+
+
+== 응답
+
+=== [Response Fields]
+include::{snippet}/test-apiGetCodeList/response-fields.adoc[]
+
+=== [Response HTTP Example]
+include::{snippet}/test-apiGetCodeList/http-response.adoc[]
+
+
+== 테스트 코드
+=== [샘플]
+include::{snippet}/test-apiGetCodeList/http-request.adoc[]
+
+include::{snippet}/test-apiGetCodeList/curl-request.adoc[]
+
+include::{snippet}/test-apiGetCodeList/httpie-request.adoc[]

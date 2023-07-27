@@ -1,0 +1,226 @@
+buildscript {
+	ext {
+		groupId = "kr.dnt"
+		versionName = "1.0.0"
+		springBootVersion = '2.5.7'
+		dependencyManagementVersion = '1.0.11.RELEASE'
+		springCloudVersion = "2020.0.3"
+
+		junitVersion = "5.7.1"
+		lombokVersion = "1.18.12"
+
+		// for QueryDSL
+		queryDslVersion = '4.4.0'
+		querydslPluginVersion = '1.0.10'
+		h2Version = "1.4.200"
+
+		restDocsVersion = "2.0.5.RELEASE"
+		jacksonVersion = "2.11.4"
+
+		asciidoctorVersion = "3.3.2"
+
+		dockerRegId = "jayuroun"
+		projectName = "dnt"
+		distribute = "dev"
+
+	}
+
+	repositories {
+		mavenCentral()
+		// for QueryDSL
+		maven { url "https://plugins.gradle.org/m2/" }
+	}
+
+	dependencies {
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+		classpath "io.spring.gradle:dependency-management-plugin:${dependencyManagementVersion}"
+		classpath "org.asciidoctor:asciidoctor-gradle-jvm:${asciidoctorVersion}"
+		classpath "org.asciidoctor:asciidoctor-gradle-jvm-pdf:${asciidoctorVersion}"
+		// for QueryDSL
+		classpath "gradle.plugin.com.ewerk.gradle.plugins:querydsl-plugin:${querydslPluginVersion}"
+		//
+		classpath "gradle.plugin.com.google.cloud.tools:jib-gradle-plugin:3.2.1"
+
+	}
+}
+
+
+allprojects {
+	group = groupId
+	version = versionName
+
+	apply plugin: 'java'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
+
+	// 설명1
+	apply plugin: 'org.asciidoctor.jvm.convert'
+	apply plugin: "org.asciidoctor.jvm.pdf"
+	apply plugin: "com.google.cloud.tools.jib"
+
+	targetCompatibility = 11
+	sourceCompatibility = 11
+
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+		implementation 'org.springframework.boot:spring-boot-starter-test'
+
+	}
+
+	// 설명
+	ext {
+		snippetsDir = file('build/generated-snippets')
+
+	}
+
+	dependencyManagement {
+		imports {
+			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		}
+	}
+
+	// 설명
+	asciidoctor {
+		inputs.dir snippetsDir
+		dependsOn test
+	}
+
+	// 설명
+	configurations {
+		asciidoctorExtensions // dependencies 에서 적용한 것 추가
+		compileOnly {
+			extendsFrom annotationProcessor
+		}
+	}
+
+	jib {
+		if (project.hasProperty("appVersion")) {
+			project.version = appVersion
+		}
+
+		if (project.hasProperty("distribute")) {
+			distribute = distribute
+		}
+
+		println("gradle docker-plugin start = ${project.projectName}-${project.name}:${project.version}")
+		from {
+			image = "openjdk:11"
+		}
+		to {
+			allowInsecureRegistries = true
+			image = "jayutest.best:56789/${project.projectName}-${distribute}/${project.projectName}-${project.name}:${project.version}"
+			tags = ['latest']
+			auth {
+				username = dockerUser
+				password = dockerPassword
+			}
+		}
+		container {
+			jvmFlags = ["-Xms128m", "-Xmx128m"]
+		}
+	}
+}
+
+
+// for QueryDSL
+task cleanGeneatedDir(type: Delete) {
+	delete file('src/main/generated')
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+
+	// runtime('com.h2database:h2')
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+	//querydsl 추가
+	implementation 'com.querydsl:querydsl-jpa'
+	implementation 'com.querydsl:querydsl-apt'
+
+	// actuator
+//	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// for QueryDSL
+	implementation "com.querydsl:querydsl-core:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jpa"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+
+	implementation "org.modelmapper:modelmapper:2.4.5"
+	implementation "com.google.code.gson:gson:2.8.2"
+
+	// spring-restdocs-asciidoctor 추가. 프로젝트에서 .adoc 파일을 읽어 html 문서로 export
+	implementation "org.springframework.restdocs:spring-restdocs-asciidoctor"
+	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
+	// spring-restdocs-mockmvc 추가. mockmvc 기반으로 사용 가능
+	testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc:${restDocsVersion}"
+	// spring boot test 를 위해 추가. testImplementation 은 테스트시에만 적용됨
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+}
+
+// RestDocs 설명
+asciidoctor {
+	attributes 'pdf-fontsdir': file('src/docs/fonts') // fonts 파일 경로
+	attributes 'pdf-stylesdir': file('src/docs/themes') // style 파일 경로
+	attributes 'pdf-style': 'SourceHanSerifCN'
+
+	configurations 'asciidoctorExtensions' // dependencies 에서 적용한 것 추가
+
+	sources {
+		include("**/*.adoc", "**/common/*.adoc") // include 에 작성된 adoc 파일만 문서화작업. /common/ 처럼 경로를 나눠서 작업도 가능
+	}
+
+	// 테스트 코드 실행 시 이전에 테스트했던 것에 변화가 없어도 다시 테스트를 수행할 것인지에 대한 여부를 설정 (false:항상 테스트를 수행)
+	outputs.upToDateWhen { false }
+	outputOptions {
+		backends = ['html5', 'pdf']
+	}
+
+	inputs.dir snippetsDir
+	dependsOn test
+
+	baseDirFollowsSourceFile()
+}
+
+// asciidoctor 태스크의 첫 번째 실행. 기존 docs 파일 삭제
+asciidoctor.doFirst {
+	delete file('src/main/resources/static/docs')
+}
+
+// build 경로에 생성된 API 문서를 접근이 쉽도록 resources 경로로 복사
+task copyAsciidoc(type: Copy) {
+	// asciidoctor 태스크 작업 후에 copy 실행
+	dependsOn asciidoctor
+	// from 경로에 있는 (html)파일이 복사 대상
+	from file("${buildDir}/docs/asciidoc/html5")
+	// into 경로에 복사
+	into file("src/main/resources/static/docs")
+}
+
+test {
+	outputs.dir snippetsDir
+	useJUnitPlatform()
+}
+
+build {
+	// build 작업이 실행될 때 copyAsciidoc 작업도 실행
+	dependsOn copyAsciidoc
+}
+
+// Test 태스크일 때 systemProperty 설정
+tasks.withType(Test) {
+	// eureka client 비활성화 설정. Test일 때 eureka의 오류는 무시하기 위한 설정값
+	systemProperty 'eureka.client.enabled', 'false'
+}

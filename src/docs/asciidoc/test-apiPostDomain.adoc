@@ -1,0 +1,36 @@
+ifndef::snippet[]
+:snippet: ../../../build/generated-snippets
+endif::[]
+
+
+[[introduction]]
+== 소개
+- Post //v1/domain
+
+== 요청
+// === [Request Headers]
+// include::{snippet}/test-apiPostDomain/request-headers.adoc[]
+
+=== [Request Body]
+include::{snippet}/test-apiPostDomain/request-body.adoc[]
+
+=== [Request Fields]
+include::{snippet}/test-apiPostDomain/request-fields.adoc[]
+
+
+== 응답
+
+=== [Response Fields]
+include::{snippet}/test-apiPostDomain/response-fields.adoc[]
+
+=== [Response HTTP Example]
+include::{snippet}/test-apiPostDomain/http-response.adoc[]
+
+
+== 테스트 코드
+=== [샘플]
+include::{snippet}/test-apiPostDomain/http-request.adoc[]
+
+include::{snippet}/test-apiPostDomain/curl-request.adoc[]
+
+include::{snippet}/test-apiPostDomain/httpie-request.adoc[]

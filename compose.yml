@@ -1,0 +1,31 @@
+version: '3'
+services:
+  dnt-db:
+    container_name: dnt-db
+    restart: always
+    image: mariadb:10.6
+    environment:
+      MYSQL_ROOT_PASSWORD: 10041004
+      MYSQL_DATABASE: dnt
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 10041004
+    ports:
+      - "3305:3306"
+    volumes:
+      - ./.data:/var/lib/mysql
+    networks:
+      - dnt-net
+networks:
+  dnt-net:
+    driver: bridge
+
+
+
+#  dnt-api-service-container:
+#    image: jayutest.best:56789/dnt-dev/dnt-api:latest
+#    hostname: dnt-api
+#    ports:
+#      - 10030:8120
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=dev
+#      - TZ=Asia/Seoul

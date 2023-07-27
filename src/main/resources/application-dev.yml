@@ -1,0 +1,67 @@
+server:
+  port: 8120
+
+spring:
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:3306/dnt?serverTimezone=Asia/Seoul&useUnicode=true&allowPublicKeyRetrieval=true&useSSL=false
+#    url: jdbc:mariadb://host.docker.internal:3305/dnt?serverTimezone=Asia/Seoul&useUnicode=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: root
+    password: 10041004
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    show-sql: true
+    generate-ddl: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        use_sql_comments: true
+        format_sql: true
+  session:
+    storage-type: redis
+  redis:
+    host: localhost
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 8
+  zipkin:
+    base-url: ${SPRING_ZIPKIN_BASE_URL:http://localhost:9411/}
+
+  flyway:
+    baselineOnMigrate: true
+    #    enabled: true
+    enabled: false
+  jasypt:
+    encryptor:
+      bean: jasyptStringEncryptor
+      password: 1234567890
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://10.0.1.60:8761/eureka/
+
+
+
+# cors 설정
+cors:
+  allowed-origins: 'http://127.0.0.1:3000,http://127.0.0.1:8040'
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: '*'
+  max-age: 3600
+
+# 토큰 관련 secret Key 및 RedirectUri 설정
+app:
+  auth:
+    tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
+    tokenExpiry: 3600000
+    refreshTokenExpiry: 604800000

@@ -1,0 +1,59 @@
+= API Document
+dnt service
+:doctype: book
+:title-logo-image: image::jnlogo.png[]
+:icons: font
+:imagesdir: ./images
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks: /build/docs/asciidoc/html5/
+:docinfo: shared-head
+
+[[introduction]]
+== 소개
+domain name transaction
+
+
+// [[introduction]]
+// == 서비스환경
+// 해당 API서비스의 서버 도메인 환경은 다음과 같습니다.
+//
+// === Domain
+// image::jnlogo.png[]
+// |===
+// | 환경 | URI
+//
+// | 개발서버
+// | `salt.dev`
+//
+// | 운영서버
+// | `salt.prod`
+// |===
+
+<<<
+= 응답코드
+include::./overview.adoc[]
+<<<
+
+
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+:root: ./
+endif::[]
+
+
+<<<
+= 도메인의 코드 리스트 조회 API
+include::./test-apiGetCodeList.adoc[]
+<<<
+
+<<<
+= 도메인 데이터 생성 API
+include::./test-apiPostDomain.adoc[]
+<<<
+
+<<<
+= 도메인 코드로 변환 API
+include::./test-apiGetTransactionCode.adoc[]
+>>>
